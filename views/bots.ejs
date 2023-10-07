@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/css/style.css">
+  <title>Bots</title>
+</head>
+<body>
+  <h1>Our Amazing Bots</h1>
+  <!-- Display your bots/models here using data passed from the server -->
+  <% for (const bot of bots) { %>
+    <div class="bot-card">
+      <h2><%= bot.name %></h2>
+      <!-- Additional bot information here -->
+    </div>
+  <% } %>
+</body>
+</html>
