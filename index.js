@@ -26,6 +26,11 @@ app.get('/about', (req, res) => {
   res.render('about');
 });
 
+// Serve models from the models directory
+app.use('/models', express.static(path.join(__dirname, 'models')));
+
+// Your other routes and configurations go here...
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
