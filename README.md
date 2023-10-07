@@ -15,3 +15,6 @@ script.js: Dies ist ein grundlegender Startpunkt.
 Du musst die Routen und Ansichten entsprechend deiner Anforderungen erweitern und anpassen. 
 Denke daran, die Umgebungsvariablen in der .env-Datei mit den tatsächlichen Daten zu füllen und
  sicherzustellen, dass du die benötigten Node.js-Pakete installierst (Express, EJS).
+ 
+ Requirements um auf eigene Maschine am Projekt zu arbeiten:
+ - Node.js installieren und Systemvariable aktualisieren (https://nodejs.org/en/download)
