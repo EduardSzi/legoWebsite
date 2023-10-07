@@ -18,3 +18,6 @@ Denke daran, die Umgebungsvariablen in der .env-Datei mit den tatsächlichen Dat
  
  Requirements um auf eigene Maschine am Projekt zu arbeiten:
  - Node.js installieren und Systemvariable aktualisieren (https://nodejs.org/en/download)
+   -> Gegencheck im Terminal mit: "node -v"
+ - Installiere die Abhängigkeiten deines Projekts: "npm install"
+ - Starte den Server mit: "node index.js" (es sollte eine Ausgabe folgen, dass der Server auf http://localhost:3000 läuft)

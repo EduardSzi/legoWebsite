@@ -1,0 +1,12 @@
+{
+  "name": "legoWebsite",
+  "version": "1.0.0",
+  "description": "Web page for visualizing 3D lego models",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
