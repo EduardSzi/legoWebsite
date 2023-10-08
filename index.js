@@ -11,25 +11,25 @@ app.set('views', path.join(__dirname, 'views'));
 // Static files (CSS, JS, etc.)
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Serve models from the models directory
+app.use('/models', express.static(path.join(__dirname, 'models')));
+
+// Your other routes and configurations go here...
+
 // Routes
 app.get('/', (req, res) => {
   res.render('home');
 });
 
 app.get('/bots', (req, res) => {
-  // Fetch data from Contentful or load models from the server
-  const botsData = /* Fetch your data here */;
-  res.render('bots', { bots: botsData });
+  // Fetch data for the model dropdown (replace with your logic)
+  const modelData = ['model1', 'model2', /* Add more models as needed */];
+  res.render('bots', { models: modelData });
 });
 
 app.get('/about', (req, res) => {
   res.render('about');
 });
-
-// Serve models from the models directory
-app.use('/models', express.static(path.join(__dirname, 'models')));
-
-// Your other routes and configurations go here...
 
 // Start server
 const PORT = process.env.PORT || 3000;
