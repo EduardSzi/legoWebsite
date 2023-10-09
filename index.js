@@ -5,7 +5,15 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors());
+
+// Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve static files from the 'models' directory
+app.use('/models', express.static(path.join(__dirname, 'models')));
+
+// Serve static files from the 'views' directory
+app.use('/views', express.static(path.join(__dirname, 'views')));
 
 app.get('/favicon.ico', (req, res) => res.status(204));
 

@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <title>lego::lab</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.157.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.157.0/examples/jsm/"
+      }
+    }
+  </script>
+  <style>
+    /* Remove the navbar's default margin-bottom and rounded borders */ 
+    .navbar {
+      margin-bottom: 0;
+      border-radius: 0;
+      background-color: #DA0000;
+    }
+    
+    /* Color of Brand-Text (lego::lab) */
+    .navbar-brand {
+      color: white !important; /* Farbe nach deiner Wahl */
+    }
+
+    /* Color of Navbar-Text (Home, Bots, About) */
+    .navbar-nav a {
+      color: WHITE !important; /* Farbe nach deiner Wahl */
+    }
+
+    /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+    .row.content {height: 650px}
+    
+    /* Set gray background color and 100% height */
+    .sidenav {
+      padding-top: 20px;
+      background-color: WHITE;
+      height: 100%;
+    }
+    
+    /* Keep footer at bottom of the browser window, when height over min-height */
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Set black dark gray color, white text and some padding */
+    footer {
+      background-color: #3E0000;
+      color: white;
+      margin-top: auto;
+      padding: 15px;
+      width: 100%;
+    }
+    
+    /* On small screens, set height to 'auto' for sidenav and grid */
+    @media screen and (max-width: 767px) {
+      .sidenav {
+        height: auto;
+        padding: 15px;
+      }
+      .row.content {height:auto;} 
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">lego::lab</a>
+    </div>
+    <div class="collapse navbar-collapse" id="myNavbar">
+      <ul class="nav navbar-nav">
+        <li><a href="/">Home</a></li>
+        <li><a href="/bots">Bots</a></li>
+        <li><a href="/about">About</a></li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+      </ul>
+    </div>
+  </div>
+</nav>
+ 
+<div class="container-fluid text-center">    
+  <div class="row content">
+    <div class="col-sm-2 sidenav">
+    </div>
+
+    <div class="col-sm-8 text-left"> 
+      <h2>Bots Viewer</h2>
+      <hr>
+
+      <div id="info">
+        <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - LDrawLoader
+      </div>
+    
+      <script type="module">
+    
+          import * as THREE from 'three';
+    
+          import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
+    
+          import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+          import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+    
+          import { LDrawLoader } from 'three/addons/loaders/LDrawLoader.js';
+          import { LDrawUtils } from 'three/addons/utils/LDrawUtils.js';
+    
+          let container, progressBarDiv;
+    
+          let camera, scene, renderer, controls, gui, guiData;
+    
+          let model;
+    
+          const ldrawPath = 'models/ldraw/officialLibrary/';
+    
+          const modelFileList = {
+            'Schere-Stein-Papier': 'BUILD_Schere-Stein-Papier_v1.0.ldr',
+            'Auto': 'models/car.ldr'
+          };
+    
+          init();
+          animate();
+    
+          function init() {
+    
+            container = document.createElement( 'div' );
+            document.body.appendChild( container );
+    
+            camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 10000 );
+            camera.position.set( 150, 200, 250 );
+    
+            //
+    
+            renderer = new THREE.WebGLRenderer( { antialias: true } );
+            renderer.setPixelRatio( window.devicePixelRatio );
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            container.appendChild( renderer.domElement );
+    
+            // scene
+    
+            const pmremGenerator = new THREE.PMREMGenerator( renderer );
+    
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color( 0xdeebed );
+            scene.environment = pmremGenerator.fromScene( new RoomEnvironment( renderer ) ).texture;
+    
+            controls = new OrbitControls( camera, renderer.domElement );
+            controls.enableDamping = true;
+    
+            //
+    
+            guiData = {
+              modelFileName: modelFileList[ 'Car' ],
+              displayLines: true,
+              conditionalLines: true,
+              smoothNormals: true,
+              buildingStep: 0,
+              noBuildingSteps: 'No steps.',
+              flatColors: false,
+              mergeModel: false
+            };
+    
+            window.addEventListener( 'resize', onWindowResize );
+    
+            progressBarDiv = document.createElement( 'div' );
+            progressBarDiv.innerText = 'Loading...';
+            progressBarDiv.style.fontSize = '3em';
+            progressBarDiv.style.color = '#888';
+            progressBarDiv.style.display = 'block';
+            progressBarDiv.style.position = 'absolute';
+            progressBarDiv.style.top = '50%';
+            progressBarDiv.style.width = '100%';
+            progressBarDiv.style.textAlign = 'center';
+    
+    
+            // load materials and then the model
+    
+            reloadObject( true );
+    
+          }
+    
+          function updateObjectsVisibility() {
+    
+            model.traverse( c => {
+    
+              if ( c.isLineSegments ) {
+    
+                if ( c.isConditionalLine ) {
+    
+                  c.visible = guiData.conditionalLines;
+    
+                } else {
+    
+                  c.visible = guiData.displayLines;
+    
+                }
+    
+              } else if ( c.isGroup ) {
+    
+                // Hide objects with building step > gui setting
+                c.visible = c.userData.buildingStep <= guiData.buildingStep;
+    
+              }
+    
+            } );
+    
+          }
+    
+          function reloadObject( resetCamera ) {
+    
+            if ( model ) {
+    
+              scene.remove( model );
+    
+            }
+    
+            model = null;
+    
+            updateProgressBar( 0 );
+            showProgressBar();
+    
+            // only smooth when not rendering with flat colors to improve processing time
+            const lDrawLoader = new LDrawLoader();
+            lDrawLoader.smoothNormals = guiData.smoothNormals && ! guiData.flatColors;
+            lDrawLoader
+              .setPath( ldrawPath )
+              .load( guiData.modelFileName, function ( group2 ) {
+    
+                if ( model ) {
+    
+                  scene.remove( model );
+    
+                }
+    
+                model = group2;
+    
+                // demonstrate how to use convert to flat colors to better mimic the lego instructions look
+                if ( guiData.flatColors ) {
+    
+                  function convertMaterial( material ) {
+    
+                    const newMaterial = new THREE.MeshBasicMaterial();
+                    newMaterial.color.copy( material.color );
+                    newMaterial.polygonOffset = material.polygonOffset;
+                    newMaterial.polygonOffsetUnits = material.polygonOffsetUnits;
+                    newMaterial.polygonOffsetFactor = material.polygonOffsetFactor;
+                    newMaterial.opacity = material.opacity;
+                    newMaterial.transparent = material.transparent;
+                    newMaterial.depthWrite = material.depthWrite;
+                    newMaterial.toneMapping = false;
+    
+                    return newMaterial;
+    
+                  }
+    
+                  model.traverse( c => {
+    
+                    if ( c.isMesh ) {
+    
+                      if ( Array.isArray( c.material ) ) {
+    
+                        c.material = c.material.map( convertMaterial );
+    
+                      } else {
+    
+                        c.material = convertMaterial( c.material );
+    
+                      }
+    
+                    }
+    
+                  } );
+    
+                }
+    
+                // Merge model geometries by material
+                if ( guiData.mergeModel ) model = LDrawUtils.mergeObject( model );
+    
+                // Convert from LDraw coordinates: rotate 180 degrees around OX
+                model.rotation.x = Math.PI;
+    
+                scene.add( model );
+    
+                guiData.buildingStep = model.userData.numBuildingSteps - 1;
+    
+                updateObjectsVisibility();
+    
+                // Adjust camera and light
+    
+                const bbox = new THREE.Box3().setFromObject( model );
+                const size = bbox.getSize( new THREE.Vector3() );
+                const radius = Math.max( size.x, Math.max( size.y, size.z ) ) * 0.5;
+    
+                if ( resetCamera ) {
+    
+                  controls.target0.copy( bbox.getCenter( new THREE.Vector3() ) );
+                  controls.position0.set( - 2.3, 1, 2 ).multiplyScalar( radius ).add( controls.target0 );
+                  controls.reset();
+    
+                }
+    
+                createGUI();
+    
+                hideProgressBar();
+    
+              }, onProgress, onError );
+    
+          }
+    
+          function onWindowResize() {
+    
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+    
+            renderer.setSize( window.innerWidth, window.innerHeight );
+    
+          }
+    
+          function createGUI() {
+    
+            if ( gui ) {
+    
+              gui.destroy();
+    
+            }
+    
+            gui = new GUI();
+    
+            gui.add( guiData, 'modelFileName', modelFileList ).name( 'Model' ).onFinishChange( function () {
+    
+              reloadObject( true );
+    
+            } );
+    
+            gui.add( guiData, 'flatColors' ).name( 'Flat Colors' ).onChange( function () {
+    
+              reloadObject( false );
+    
+            } );
+    
+            gui.add( guiData, 'mergeModel' ).name( 'Merge model' ).onChange( function () {
+    
+              reloadObject( false );
+    
+            } );
+    
+            if ( model.userData.numBuildingSteps > 1 ) {
+    
+              gui.add( guiData, 'buildingStep', 0, model.userData.numBuildingSteps - 1 ).step( 1 ).name( 'Building step' ).onChange( updateObjectsVisibility );
+    
+            } else {
+    
+              gui.add( guiData, 'noBuildingSteps' ).name( 'Building step' ).onChange( updateObjectsVisibility );
+    
+            }
+    
+            gui.add( guiData, 'smoothNormals' ).name( 'Smooth Normals' ).onChange( function changeNormals() {
+    
+              reloadObject( false );
+    
+            } );
+    
+            gui.add( guiData, 'displayLines' ).name( 'Display Lines' ).onChange( updateObjectsVisibility );
+            gui.add( guiData, 'conditionalLines' ).name( 'Conditional Lines' ).onChange( updateObjectsVisibility );
+    
+          }
+    
+          //
+    
+          function animate() {
+    
+            requestAnimationFrame( animate );
+            controls.update();
+            render();
+    
+          }
+    
+          function render() {
+    
+            renderer.render( scene, camera );
+    
+          }
+    
+          function onProgress( xhr ) {
+    
+            if ( xhr.lengthComputable ) {
+    
+              updateProgressBar( xhr.loaded / xhr.total );
+    
+              console.log( Math.round( xhr.loaded / xhr.total * 100, 2 ) + '% downloaded' );
+    
+            }
+    
+          }
+    
+          function onError( error ) {
+    
+            const message = 'Error loading model';
+            progressBarDiv.innerText = message;
+            console.log( message );
+            console.error( error );
+    
+          }
+    
+          function showProgressBar() {
+    
+            document.body.appendChild( progressBarDiv );
+    
+          }
+    
+          function hideProgressBar() {
+    
+            document.body.removeChild( progressBarDiv );
+    
+          }
+    
+          function updateProgressBar( fraction ) {
+    
+            progressBarDiv.innerText = 'Loading... ' + Math.round( fraction * 100, 2 ) + '%';
+    
+          }
+    
+        </script>
+
+    </div>
+</div>
+</div>
+
+<!-- LDraw.org CC BY 2.0 Parts Library attribution + Website Copyright -->
+<footer class="container-fluid text-center">
+  <p>Copyright © 2023 lego::lab, HKA - Hochschule Karlsruhe</p>
+  <p><a href="http://www.ldraw.org/">Diese Software nutzt Teile aus der LDraw Bibliothek.</a></p>
+</footer>
+
+</body>
+</html>
+
