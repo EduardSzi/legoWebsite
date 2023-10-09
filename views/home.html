@@ -38,11 +38,20 @@
       height: 100%;
     }
     
+    /* Keep footer at bottom of the browser window, when height over min-height */
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
     /* Set black dark gray color, white text and some padding */
     footer {
       background-color: #3E0000;
       color: white;
+      margin-top: auto;
       padding: 15px;
+      width: 100%;
     }
     
     /* On small screens, set height to 'auto' for sidenav and grid */
@@ -69,7 +78,6 @@
         <li><a href="/about">About</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
       </ul>
     </div>
   </div>
