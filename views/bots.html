@@ -8,7 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> 
   <script type="importmap">
     {
       "imports": {
@@ -36,12 +36,7 @@
     }
 
     
-    /* Size of ldr viewer */
-    canvas {
-      /* Some styles that might affect the size */
-      width: 80% !important;
-      height: 80% !important;
-    }    
+    
 
     /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
     .row.content {height: 650px}
@@ -106,6 +101,18 @@
     <div class="col-sm-8 text-left"> 
       <h2>Bots Viewer</h2>
       <hr>
+
+      <input id="model-bg-color" type="color" value="#8f8b8a" hidden >
+
+      <div id="buttonBar">
+        <button id="resetBtn" title="Reset Model"><i>Reset</i></button>
+        <button id="physicalBtn" title="Toggle Cell Shading/Phyical Render Mode"><i>Cell shading</i></button>
+        <button id="bkgColorBtn" title="Change Background Color"><i>BG Color</i></button>
+      </div>
+      <div id="buttonBar" class="transition hidden">
+      </div>
+      <div id="progress">
+      </div>
 
       <div id="webgl-container"></div>
       <script type="module" src="/views/main.js"></script>
