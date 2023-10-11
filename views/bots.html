@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script> 
+
   <script type="importmap">
     {
       "imports": {
@@ -35,11 +36,10 @@
       color: WHITE !important; /* Farbe nach deiner Wahl */
     }
 
-    
-    
-
     /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
-    .row.content {height: 650px}
+    .row.content {
+      height: 650px;
+    }
     
     /* Set gray background color and 100% height */
     .sidenav {
@@ -74,58 +74,61 @@
     }
   </style>
 </head>
+
 <body>
+  <nav class="navbar navbar-inverse">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#">lego::lab</a>
+      </div>
+      <div class="collapse navbar-collapse" id="myNavbar">
+        <ul class="nav navbar-nav">
+          <li><a href="/">Home</a></li>
+          <li><a href="/bots">Bots</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right">
+        </ul>
+      </div>
+    </div>
+  </nav>
+  
+  <div class="container-fluid text-center">    
+    <div class="row content">
+      
 
-<nav class="navbar navbar-inverse">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <a class="navbar-brand" href="#">lego::lab</a>
-    </div>
-    <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav">
-        <li><a href="/">Home</a></li>
-        <li><a href="/bots">Bots</a></li>
-        <li><a href="/about">About</a></li>
-      </ul>
-      <ul class="nav navbar-nav navbar-right">
-      </ul>
-    </div>
+      <div class="col-sm-8 text-left"> 
+        <h2>Bots Viewer</h2>
+        <hr>
+
+        <form name="modelSelection" id="modelSelection" action="">
+          <p>Model:</p>
+          <select name="model" id="modelSelect">
+          </select>
+        </form> 
+        <br><br>
+        <input id="model-bg-color" type="color" value="#8f8b8a" hidden >
+
+        <div id="buttonBar">
+          <button id="resetBtn" title="Reset Model"><i>Reset</i></button>
+          <button id="physicalBtn" title="Toggle Cell Shading/Phyical Render Mode"><i>Cell shading</i></button>
+          <button id="bkgColorBtn" title="Change Background Color"><i>BG Color</i></button>
+        </div>
+        
+        <div id="webgl-container"></div>
+        <script type="module" src="/views/main.js"></script>
+
+        <hr>
+
+      </div>
   </div>
-</nav>
- 
-<div class="container-fluid text-center">    
-  <div class="row content">
-    <div class="col-sm-2 sidenav">
-    </div>
+  </div>
 
-    <div class="col-sm-8 text-left"> 
-      <h2>Bots Viewer</h2>
-      <hr>
-
-      <input id="model-bg-color" type="color" value="#8f8b8a" hidden >
-
-      <div id="buttonBar">
-        <button id="resetBtn" title="Reset Model"><i>Reset</i></button>
-        <button id="physicalBtn" title="Toggle Cell Shading/Phyical Render Mode"><i>Cell shading</i></button>
-        <button id="bkgColorBtn" title="Change Background Color"><i>BG Color</i></button>
-      </div>
-      <div id="buttonBar" class="transition hidden">
-      </div>
-      <div id="progress">
-      </div>
-
-      <div id="webgl-container"></div>
-      <script type="module" src="/views/main.js"></script>
-
-    </div>
-</div>
-</div>
-
-<!-- LDraw.org CC BY 2.0 Parts Library attribution + Website Copyright -->
-<footer class="container-fluid text-center">
-  <p>Copyright © 2023 lego::lab, HKA - Hochschule Karlsruhe</p>
-  <p><a href="http://www.ldraw.org/">Diese Software nutzt Teile aus der LDraw Bibliothek.</a></p>
-</footer>
+  <!-- LDraw.org CC BY 2.0 Parts Library attribution + Website Copyright -->
+  <footer class="container-fluid text-center">
+    <p>Copyright © 2023 lego::lab, HKA - Hochschule Karlsruhe</p>
+    <p><a href="http://www.ldraw.org/">Diese Software nutzt Teile aus der LDraw Bibliothek.</a></p>
+  </footer>
 
 </body>
 </html>

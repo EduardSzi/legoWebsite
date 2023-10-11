@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
+const fs = require('fs');
 
 const app = express();
 
@@ -11,6 +12,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve static files from the 'models' directory
 app.use('/models', express.static(path.join(__dirname, 'models')));
+
+app.get('/models/modelList', (req, res) => {
+  try {
+    const modelsDirectory = path.join(__dirname, 'models');
+    const models = fs.readdirSync(modelsDirectory)
+      .filter(file => file.endsWith('.ldr'))
+      .map(file => file.replace('.ldr', ''));
+
+    res.json({ models });
+  } catch (error) {
+    console.error('Error getting model list:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
 
 // Serve static files from the 'views' directory
 app.use('/views', express.static(path.join(__dirname, 'views')));

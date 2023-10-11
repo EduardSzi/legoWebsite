@@ -1,101 +1,212 @@
 import * as THREE from 'three';
 import { LDrawLoader } from 'three/addons/loaders/LDrawLoader.js';
 import WebGL from 'three/addons/capabilities/WebGL.js';
+import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitControls.js';
+
+function init() {
+
+  // Reset camera to initial position and rotation
+  camera.position.copy(initialCameraPosition);
+  camera.rotation.copy(initialCameraRotation);
+
+  // Reset controls
+  controls.reset();
+
+  // Set camera position
+  camera.position.x = 150;
+  camera.position.y = 150;
+  camera.position.z = 250;
+
+  // Set background color
+  renderer.setClearColor(0x8f8b8a);
+
+  // Activate shadows
+  renderer.shadowMap.enabled = true;
+
+  // Initialize controls
+  controls.enableZoom = true;
+}
 
 function animate() {
   requestAnimationFrame(animate);
+
+  // Update controls
+  controls.update();
+
   renderer.render(scene, camera);
 }
 
+// Function to load a new model based on the selected option
+async function loadModel(modelName) {
+  // Assuming models are in the "models" folder
+  const modelPath = `/models/${modelName}.ldr`;
+
+  // Clear the existing scene
+  scene.children = [];
+
+  // Load the new model
+  loader.load(
+    modelPath,
+    function (group) {
+      legoModel = group;
+      // Rotate the loaded model 180 degrees around the x-axis
+      legoModel.rotation.x = Math.PI;
+      scene.add(legoModel);
+    },
+    function (xhr) {
+      console.log((xhr.loaded / xhr.total) * 100 + '% loaded');
+    },
+    function (error) {
+      console.log('An error occurred');
+    }
+  );
+}
+
+// Function to fetch the list of model names
+async function fetchModelList() {
+  try {
+    // Assuming you have an endpoint that provides the list of models
+    const response = await fetch('/models/modelList');
+    const data = await response.json();
+
+    // Populate the dropdown with model names
+    const modelSelect = document.getElementById('modelSelect');
+    data.models.forEach((modelName) => {
+      const option = document.createElement('option');
+      option.value = modelName;
+      option.text = modelName;
+      modelSelect.add(option);
+    });
+
+    // Trigger loading the default model
+    const defaultModel = modelSelect.value;
+    loadModel(defaultModel);
+  } catch (error) {
+    console.error('Error fetching model list:', error);
+  }
+}
+
+// Call the function to fetch and populate the model list
+fetchModelList();
+
 // Set working variables
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
 const renderer = new THREE.WebGLRenderer();
-const loader = new LDrawLoader();
-
-// Set camera position
-camera.position.z = 400;
-
-// Set background color
-renderer.setClearColor(0x8f8b8a);
-// Activate shadows
-renderer.shadowMap.enabled = true;
-
+// Desired height
+const windowHeight = 469;
+// Calculate the width to maintain the natural aspect ratio
+const windowWidth = (windowHeight / window.innerHeight) * window.innerWidth;
 // Set window size for viewer window
-renderer.setSize(824, 469);
+renderer.setSize(windowWidth, windowHeight);
 
-// Get container for viewer window
-const container = document.getElementById('webgl-container');
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+// Store initial camera position and rotation
+const initialCameraPosition = new THREE.Vector3(0, 0, 400);
+const initialCameraRotation = new THREE.Euler(0, 0, 0);
 
-// Add renderer to container
-container.appendChild(renderer.domElement); 
+const loader = new LDrawLoader();
 
 // Path to the parts
 var partsLibraryPath = "/models/ldraw/officialLibrary/";
 loader.setPartsLibraryPath(partsLibraryPath);
 
 // Load materials
-await loader.preloadMaterials( 'models/ldraw/officialLibrary/LDCfgalt.ldr' );
+await loader.preloadMaterials('models/ldraw/officialLibrary/LDCfgalt.ldr');
 
-// Load LDraw-Ressource
-loader.load(
-  // Ressource URL
-  'models/BUILD_Schere-Stein-Papier_v1.0.ldr',
-  // Called, when ressource is loaded
-  function (group) {
-    // Add group to scene
-    scene.add(group);
-  },
-  // Called while loading process
-  function (xhr) {
-    console.log((xhr.loaded / xhr.total * 100) + '% geladen');
-  },
-  // Called, when error appears
-  function (error) {
-    console.log('Ein Fehler ist aufgetreten');
-  }
-);
+const shadingButtonActive = false;
+
+const controls = new OrbitControls(camera, renderer.domElement);
+
+let legoModel;
+
+// Call init function
+init();
+
+// Get container for viewer window
+const container = document.getElementById('webgl-container');
+
+// Add renderer to container
+container.appendChild(renderer.domElement);
 
 // Error handling
 if (WebGL.isWebGLAvailable()) {
-  // Initiiere Funktion oder andere Initialisierungen hier
+  // Initiate functions or other initializations here
   animate();
 } else {
   const warning = WebGL.getWebGLErrorMessage();
   container.appendChild(warning);
 }
 
-$(document).ready( function() {
+$(document).ready(function () {
 
-
-  $("#resetBtn").click(function(){
-    $("#fileform").transition('show');
-    $("#progress").transition('show');
-    $('#buttonBar').transition('hide');
-    $("#canvas").transition('hide');
-    $("#webgl").api("remove loading");
+  $("#resetBtn").click(function () {
+    init();
+    animate();
     return false;
   });
 
-  $("#bkgColorBtn").click(function(){
-    $('#model-bg-color').click();
+  $("#physicalBtn").click(function () {
+
+    if (shadingButtonActive) {
+      scene.setPhysicalRenderingAge(0);
+      shadingButtonActive = false;
+    } else {
+      scene.setPhysicalRenderingAge(20);
+      shadingButtonActive = true;
+    }
+    animate();
   });
 
-  $("#physicalBtn").click(function(){
-    $("#webgl").api("set loading");
-    if (scene.loader.physicalRenderingAge > 0) {
-      scene.setPhysicalRenderingAge(0);
-    }
-    else {
-      scene.setPhysicalRenderingAge(20);
-    }
+  $("#bkgColorBtn").click(function () {
+
+    $('#model-bg-color').click();
+
   });
 
   $('#model-bg-color').on('change', function (e) {
-      LDR.Options.bgColor = parseInt(e.target.value.replace(/^#/, ''), 16);
-      $("#bkgColorBtn").css('background-color', e.target.value);
-      $("#canvas").css('background', e.target.value);
-      scene.scene.background = new THREE.Color(LDR.Options.bgColor);
-      scene.render();
+    renderer.setClearColor(e.target.value);
+    animate();
   });
 });
+
+// Event listener for mouse down (left-click)
+let isMouseDown = false;
+container.addEventListener('mousedown', (event) => {
+  if (event.button === controls.mouseButtons.LEFT) {
+    isMouseDown = true;
+  }
+});
+
+// Event listener for mouse up
+container.addEventListener('mouseup', (event) => {
+  if (event.button === controls.mouseButtons.LEFT) {
+    isMouseDown = false;
+  }
+});
+
+// Event listener for mouse move
+container.addEventListener('mousemove', (event) => {
+  if (isMouseDown) {
+    // Accumulate the rotation based on mouse movement
+    camera.rotation.x -= event.movementY / window.innerHeight * 2 * Math.PI;
+
+    // Restrict vertical rotation within a certain range (e.g., between -PI/2 and PI/2)
+    camera.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, camera.rotation.x));
+
+    // Rotate the model based on mouse movement
+    camera.rotation.y -= event.movementX / window.innerWidth * 2 * Math.PI;
+  }
+});
+
+// Event listener for mouse leave
+container.addEventListener('mouseleave', () => {
+  isMouseDown = false;
+});
+
+// Event listener for changes in the dropdown
+document.getElementById('modelSelect').addEventListener('change', function () {
+  const selectedModel = this.value;
+  loadModel(selectedModel);
+});
+
