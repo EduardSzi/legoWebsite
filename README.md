@@ -46,4 +46,20 @@ ANMERKUNG:
       {
         "models": ["car", "truck"]
       }
+
+   Anmerkung: Es kann sein, dass beim Hinzufügen einer neuen .ldr Datei beim Rendern scheinbar Lego Parts fehlen.
+              Dies passiert z.B. bei der Konvertierung aus der .io Datei in die .ldr.
+              Grund: Das selbe LEGO Bauteil kann z.B. in Spike Prime und EV3 eine andere Bauteilnr. haben, obwohl physikalisch identisch.
+                     Beim Exportieren mit der neuesten Lego Studio Version kann es sein, dass die Spike Prime Teilnenr. in die LDR Datei kommt,
+                     statt die EV3 Nr., was dann zu einem Fehler führt.
+              Lösung: Alle Parts Namen die in den Fehlermeldungen aus dem Web Developer Console vorkommen kopieren
+                      und nachschauen, ob das Teil im Parts Tracker zu finden ist: https://library.ldraw.org/tracker/list
+                      Falls gefunden: alles OK (der Tracker nutzt die offizielen Teile; wenn der Tracker sie finden, dann findet sie das eigene Projeckt auch)
+                      Falls nicht gefunden: nach dem Teil googeln und eine frühere Teile-Nr. finden und damit dann die alte Versin in der .LDR Datei ersetzen.
+
+                      Bsp.: Im Stein Schere Papier Modell war ein Teil mit "39367pb02.dat" (vermutlich neuere Teilenr) angegeben statt mit "39367p02.dat" (alte Teilenr).
+                      Nach dem Anpassen in der LDR Datei, wurde das Modell dann auch korrekt angezeigt.
+
+                      Änderungen und Fehler in den LDR Dateien werden unter 'models/readme_models.md' dokumentiert.
+
  
