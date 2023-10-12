@@ -63,15 +63,38 @@
       padding: 15px;
       width: 100%;
     }
-    
-    /* On small screens, set height to 'auto' for sidenav and grid */
+
+    /* For small screens (phones) */
     @media screen and (max-width: 767px) {
       .sidenav {
         height: auto;
         padding: 15px;
       }
-      .row.content {height:auto;} 
+      .row.content {
+        height: auto;
+      } 
     }
+
+    /* For tablets */
+    @media screen and (min-width: 768px) and (max-width: 991px) {
+      /* Adjust styles for tablets here */
+      .row.content {
+        height: 500px; /* Adjust the height as needed */
+      }
+    }
+
+    /* For larger screens (desktops, laptops) */
+    @media screen and (min-width: 992px) {
+      /* Adjust styles for larger screens here */
+      .row.content {
+        height: 650px; /* Adjust the height as needed */
+      }
+    }
+
+    #webgl-container {
+     position: relative;
+    }
+
   </style>
 </head>
 
@@ -102,7 +125,7 @@
         <hr>
 
         <form name="modelSelection" id="modelSelection" action="">
-          <p>Model:</p>
+          <p>Modell Auswahl:</p>
           <select name="model" id="modelSelect">
           </select>
         </form> 
@@ -110,9 +133,8 @@
         <input id="model-bg-color" type="color" value="#8f8b8a" hidden >
 
         <div id="buttonBar">
-          <button id="resetBtn" title="Reset Model"><i>Reset</i></button>
-          <button id="physicalBtn" title="Toggle Cell Shading/Phyical Render Mode"><i>Cell shading</i></button>
-          <button id="bkgColorBtn" title="Change Background Color"><i>BG Color</i></button>
+          <button id="resetBtn" title="Reset Model"><i>Zurücksetzen</i></button>
+          <button id="bkgColorBtn" title="Change Background Color"><i>Hintergrund Farbe</i></button>
         </div>
         
         <div id="webgl-container"></div>

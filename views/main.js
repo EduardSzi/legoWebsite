@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { LDrawLoader } from 'three/addons/loaders/LDrawLoader.js';
 import WebGL from 'three/addons/capabilities/WebGL.js';
 import { OrbitControls } from 'https://threejs.org/examples/jsm/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
 function init() {
 
@@ -18,7 +19,7 @@ function init() {
   camera.position.z = 250;
 
   // Set background color
-  renderer.setClearColor(0x8f8b8a);
+  renderer.setClearColor(0xb3b3b3);
 
   // Activate shadows
   renderer.shadowMap.enabled = true;
@@ -36,6 +37,14 @@ function animate() {
   renderer.render(scene, camera);
 }
 
+function onWindowResize() {
+
+  camera.aspect = ratio;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize( container.innerWidth, container.innerHeight );
+}
+
 // Function to load a new model based on the selected option
 async function loadModel(modelName) {
   // Assuming models are in the "models" folder
@@ -51,6 +60,14 @@ async function loadModel(modelName) {
       legoModel = group;
       // Rotate the loaded model 180 degrees around the x-axis
       legoModel.rotation.x = Math.PI;
+      legoModel.traverse(function (child) {
+        if (child.isMesh) {
+          // Set material to Phong material
+          //child.material = new THREE.MeshPhongMaterial({ color: 0xaaaaaa, specular: 0x111111, shininess: 200 });
+          // OR set material to Lambert material
+          //child.material = new THREE.MeshLambertMaterial({ color: 0xaaaaaa });
+        }
+      });
       scene.add(legoModel);
     },
     function (xhr) {
@@ -89,16 +106,28 @@ async function fetchModelList() {
 // Call the function to fetch and populate the model list
 fetchModelList();
 
-// Set working variables
-const scene = new THREE.Scene();
-
+// Renderer
 const renderer = new THREE.WebGLRenderer();
+const ratio = window.devicePixelRatio;
+renderer.setPixelRatio(ratio);
 // Desired height
 const windowHeight = 469;
 // Calculate the width to maintain the natural aspect ratio
 const windowWidth = (windowHeight / window.innerHeight) * window.innerWidth;
 // Set window size for viewer window
 renderer.setSize(windowWidth, windowHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+const pmremGenerator = new THREE.PMREMGenerator( renderer );
+
+// Scene
+const scene = new THREE.Scene();
+scene.environment = pmremGenerator.fromScene( new RoomEnvironment( renderer ) ).texture;
+// Ambient light
+const ambientLight = new THREE.AmbientLight(0xffffff, 1000);
+
+// Add light
+scene.add(ambientLight);
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 // Store initial camera position and rotation
@@ -146,18 +175,6 @@ $(document).ready(function () {
     return false;
   });
 
-  $("#physicalBtn").click(function () {
-
-    if (shadingButtonActive) {
-      scene.setPhysicalRenderingAge(0);
-      shadingButtonActive = false;
-    } else {
-      scene.setPhysicalRenderingAge(20);
-      shadingButtonActive = true;
-    }
-    animate();
-  });
-
   $("#bkgColorBtn").click(function () {
 
     $('#model-bg-color').click();
@@ -203,6 +220,9 @@ container.addEventListener('mousemove', (event) => {
 container.addEventListener('mouseleave', () => {
   isMouseDown = false;
 });
+
+// Event listener for resize
+window.addEventListener( 'resize', onWindowResize );
 
 // Event listener for changes in the dropdown
 document.getElementById('modelSelect').addEventListener('change', function () {
