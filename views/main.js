@@ -36,7 +36,7 @@ function animate() {
 
   renderer.render(scene, camera);
 }
-
+/*
 function onWindowResize() {
 
   camera.aspect = ratio;
@@ -44,6 +44,7 @@ function onWindowResize() {
 
   renderer.setSize( container.innerWidth, container.innerHeight );
 }
+*/
 
 // Function to load a new model based on the selected option
 async function loadModel(modelName) {
